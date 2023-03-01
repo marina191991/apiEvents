@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Ticket;
+use GuzzleHttp\Psr7\Request;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateOrderRequest extends FormRequest
 {
+    protected $ticketsIds =[] ;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -19,10 +22,10 @@ class CreateOrderRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\Rule|array|string>
      */
-    public function rules(): array
+    public function rules(\Illuminate\Http\Request $request): array
     {
         return [
-            'places' => ['required', 'array'],
+           'places' => ['required', 'array'],
         ];
     }
 

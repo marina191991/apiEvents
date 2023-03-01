@@ -12,28 +12,20 @@ use Illuminate\Http\JsonResponse;
 
 class OrderController extends Controller
 {
-    /**
-     * @param $id
-     * @return JsonResponse
-     */
-    public function confirm($id): JsonResponse
-    {
-        Order::query()->where('id', $id)->update(['status' => 'confirmed']);
-        $order = Order::query()->find($id);
-        $order->tickets;
-        return new JsonResponse($order);
+    private OrderService $orderService;
 
+    public function __construct(OrderService $orderService)
+    {
+        $this->orderService = $orderService;
     }
 
     /**
-     * @param $id
+     * @param Order $order
      * @return JsonResponse
      */
-    public function cancel($id): JsonResponse
+    public function confirm(Order $order): JsonResponse
     {
-        Order::query()->where('id', $id)->update(['status' => 'canceled']);
-        $order = Order::query()->find($id);
-        $order->tickets;
+        $order = $this->orderService->confirm($order);
         return new JsonResponse($order);
     }
 
@@ -41,10 +33,19 @@ class OrderController extends Controller
      * @param $id
      * @return JsonResponse
      */
-    public function get($id): JsonResponse
+    public function cancel(Order $order): JsonResponse
     {
-        $order = Order::query()->find($id);
-        $order->tickets;
+        $order = $this->orderService->cancel($order);
+        return new JsonResponse($order);
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function get(Order $order): JsonResponse
+    {
+        $order = $this->orderService->get($order);
         return new JsonResponse($order);
     }
 
@@ -53,28 +54,12 @@ class OrderController extends Controller
      * @return JsonResponse
      */
 
-    public function create(CreateOrderRequest $request, OrderService $order, TicketService $ticketService): JsonResponse
+    public function create(CreateOrderRequest $request): JsonResponse
     {
-        $tickets = $request->input("places");//[12,13]
+        $placesIds=collect($request->input('places'));
+        $createOrder = $this->orderService->create($placesIds);
 
-        $total = 0;
-        foreach ($tickets as $ticket) {
-            $ticket = Ticket::query()->find($ticket); //12
-            if (($quota = $ticket->place->quota) > 0) {
-                $total = $ticket->place->price + $total;
-                $ticketsIds[] = $ticket->id;
-                $quota = $quota - 1;
-                $ticket->place()->update(['quota' => $quota]);
-            }
-        }
-        if ($total > 0) {
-            $order = $order->create($total, 'reserved');
-            foreach ($ticketsIds as $ticketId) {
-                $ticketService->update($ticketId, 'order_id', $order->id);
-            }
-            $order->tickets;
-            return new JsonResponse($order);
-        }
-        return new JsonResponse([]);
+                 return new JsonResponse($createOrder);
+
     }
 }

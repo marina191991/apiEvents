@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Place extends Model
 {
+    //protected $fillable = ['quota'];
     public $timestamps=false;
     /**
      * @return BelongsTo

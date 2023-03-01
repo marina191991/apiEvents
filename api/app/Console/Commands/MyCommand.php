@@ -4,9 +4,7 @@ namespace App\Console\Commands;
 
 use App\Service\BlockService;
 use App\Service\EventService;
-use App\Service\OrderService;
 use App\Service\PlaceService;
-use App\Service\TicketService;
 use Illuminate\Console\Command;
 
 class MyCommand extends Command
@@ -16,52 +14,61 @@ class MyCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'create:objects {table}';
+    protected $signature = 'create:events {number}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Create new objects in table. You need to write the name of the table as attribute';
+    protected $description = 'Create events in the table. Please write the number of events being created';
 
     /**
      * Execute the console command.
      */
-    public function handle(EventService $eventService,OrderService $orderService, BlockService $blockService, TicketService $ticketService, PlaceService $placeService): void
+    public function handle(EventService $eventService, BlockService $blockService, PlaceService $placeService): void
     {
+        $events = $this->argument('number');
+        $blocksABCInEvent = 4;
+        $blocksFanzoneInEvent = 1;
+        $row = 10;
+        $number_in_row = 15;
+        $quotaFanzone = 1000;
+        $totalBlocksInEvent = $blocksABCInEvent + $blocksFanzoneInEvent;
+        $totalBlocks = $events * ($totalBlocksInEvent);
+        $fanzoneId [] = $totalBlocks;
+        $k = $totalBlocks;
+        while ($k > $totalBlocksInEvent) {
+            $k = $k - $totalBlocksInEvent;
+            $fanzoneId [] = $k;
+        };
         $faker = \Faker\Factory::create();
-        switch ($this->argument('table')) {
+        for ($i = 1; $i <= $events; $i++) {
+            $eventService->create('Event' . $i, $faker->city, $faker->dateTimeBetween('now', '+2 years'), $faker->boolean);
+            for ($k = 1; $k <= $blocksABCInEvent; $k++) {
+                $blockService->create('Block' . $k, $i);
+            }
+            $blockService->create('Fanzone', $i);
+        }
+        $this->info('Created success 6 events');
+        $this->info('Created success blocks');
 
-            case 'event':
-                for ($i = 1; $i < 6; $i++) {
-                    $eventService->create('Event' . $i,$faker->city,$faker->dateTimeBetween('now', '+2 years'),$faker->boolean);
-                }
-                $this->info('The objects created success in the Events table');
-                break;
-            case 'block':
-                for ($i = 1; $i < 6; $i++) {
-                    $blockService->create('Block' . $i, rand(1, 5));
-                }
-                $this->info('The objects created success in the Blocks table');
-                break;
-            case 'place':
-                $j = 1;
-                for ($i = 1; $i < 6; $i++) {
-                    for ($k = 1; $k <= 10; $k++) {
-                        $quota =(int) $faker->boolean;
-                        $placeService->create($faker->randomFloat(2, 20, 70), $i, $quota, $i, $j);
-                        $j++;
+        //Places
+        $j = 1;
+        while ($j <= $totalBlocks) {
+            if (in_array($j, $fanzoneId)) {
+                $placeService->create($faker->randomFloat(2, 20, 70), 0, $quotaFanzone, $j, 0);
+            } else {
+                for ($i = 1; $i <= $row; $i++) {
+                    for ($k = 1; $k <= $number_in_row; $k++) {
+                        $quota = (int)$faker->boolean;
+                        $placeService->create($faker->randomFloat(2, 20, 70), $i, $quota, $j, $k);
                     }
                 }
-                $this->info('The objects created success in the Places table');
-                break;
-            case 'ticket':
-                for ($i = 1; $i <= 50; $i++) {
-                    $barcode = $faker->numerify("### ### ###");
-                    $ticketService->create($barcode, $i);
-                }
-                $this->info('The objects created success in the Tickets table');
+            }
+            $j = $j + 1;
         }
+        $this->info('Created success places');
     }
+
 }

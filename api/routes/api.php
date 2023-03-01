@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/events', [EventController::class, 'show'])->name('getAllEvents');
 Route::get('/events/{id}/hall', [BlockController::class, 'show'])->name('getEventById');
 Route::post('/order', [OrderController::class, 'create'])->name('createOrder');
-Route::post('/order/{id}/confirm', [OrderController::class, 'confirm'])->name('getOrderById');
-Route::post('/order/{id}/cancel', [OrderController::class, 'cancel'])->name('cancelOrderById');
-Route::post('/order/{id}', [OrderController::class, 'get'])->name('getOrderById');
+Route::post('/order/{order}/confirm', [OrderController::class, 'confirm'])->name('confirmOrderById');
+Route::post('/order/{order}/cancel', [OrderController::class, 'cancel'])->name('cancelOrderById');
+Route::get('/order/{order}', [OrderController::class, 'get'])->name('getOrderById');
 
