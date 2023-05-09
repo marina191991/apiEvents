@@ -4,9 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateOrderRequest;
 use App\Models\Order;
-use App\Models\Ticket;
 use App\Service\OrderService;
-use App\Service\TicketService;
 use Illuminate\Http\JsonResponse;
 
 
@@ -30,7 +28,7 @@ class OrderController extends Controller
     }
 
     /**
-     * @param $id
+     * @param Order $order
      * @return JsonResponse
      */
     public function cancel(Order $order): JsonResponse
@@ -40,12 +38,13 @@ class OrderController extends Controller
     }
 
     /**
-     * @param $id
+     * @param Order $order
      * @return JsonResponse
      */
     public function get(Order $order): JsonResponse
     {
         $order = $this->orderService->get($order);
+
         return new JsonResponse($order);
     }
 
@@ -60,6 +59,5 @@ class OrderController extends Controller
         $createOrder = $this->orderService->create($placesIds);
 
                  return new JsonResponse($createOrder);
-
     }
 }

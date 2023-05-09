@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
-
 class OrderService
 {
     /**
@@ -18,20 +17,20 @@ class OrderService
      */
     public function create(\Illuminate\Support\Collection $placesId): Order
     {
-
         //проверили на квоту и взяли прайс
-        $placesIdCount = $placesId->countBy();//[3=>2,1=>1]
+        $placesIdCount = $placesId->countBy();
 
         foreach ($placesIdCount as $key => $placeId) {
             $place = Place::query()->find($key);
             $placeQuota = $place->quota;
+
             if ($placeId > $placeQuota) {
-                abort(404, "Количество мест id=$key осталось $placeQuota. Вы хотите приобрести $placeId");
+                abort(400, "Количество мест id=$key осталось $placeQuota. Вы хотите приобрести $placeId");
             }
             $totalPrice[] = ($place->price) * $placeId;
         }
 
-        $total = array_sum($totalPrice);
+        $total = number_format(array_sum($totalPrice),2);
         $places = $placesIdCount->keys();
         //вычесть квоту
         foreach ($placesIdCount as $key => $placeId) {
@@ -75,8 +74,9 @@ class OrderService
      * @return Model|Collection|Builder|array|null
      */
     public
-    function get(Order $order): Model|Collection|Builder|array|null
-    {
+    function get(
+        Order $order
+    ): Model|Collection|Builder|array|null {
         $order = Order::query()->find($order->id);
         $order->tickets;
         return $order;
@@ -87,8 +87,9 @@ class OrderService
      * @return Builder|array|Collection|Model
      */
     public
-    function confirm(Order $order): Builder|array|Collection|Model
-    {
+    function confirm(
+        Order $order
+    ): Builder|array|Collection|Model {
         Order::query()->where('id', $order->id)->update(['status' => 'confirmed']);
         $order = Order::query()->find($order->id);
         $order->tickets;

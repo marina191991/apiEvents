@@ -16,14 +16,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-/*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});*/
-
-Route::get('/events', [EventController::class, 'show'])->name('getAllEvents');
-Route::get('/events/{id}/hall', [BlockController::class, 'show'])->name('getEventById');
-Route::post('/order', [OrderController::class, 'create'])->name('createOrder');
-Route::post('/order/{order}/confirm', [OrderController::class, 'confirm'])->name('confirmOrderById');
-Route::post('/order/{order}/cancel', [OrderController::class, 'cancel'])->name('cancelOrderById');
-Route::get('/order/{order}', [OrderController::class, 'get'])->name('getOrderById');
+    Route::get('/events', [EventController::class, 'show'])->name('getAllEvents');
+    Route::get('/events/{id}/hall', [BlockController::class, 'show'])->name('getEventById');
+    Route::post('/order', [OrderController::class, 'create'])->name('createOrder');
+    Route::get('/order/{order}/confirm', [OrderController::class, 'confirm'])->name('confirmOrderById');
+    Route::post('/order/{order}/cancel', [OrderController::class, 'cancel'])->name('cancelOrderById');
+    Route::get('/order/{order}', [OrderController::class, 'get'])->name('getOrderById');
 
