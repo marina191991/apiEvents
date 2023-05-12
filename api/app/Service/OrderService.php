@@ -20,6 +20,7 @@ class OrderService
         //проверили на квоту и взяли прайс
         $placesIdCount = $placesId->countBy();
 
+        /** @var array $totalPrice */
         foreach ($placesIdCount as $key => $placeId) {
             $place = Place::query()->find($key);
             $placeQuota = $place->quota;
@@ -30,8 +31,10 @@ class OrderService
             $totalPrice[] = ($place->price) * $placeId;
         }
 
-        $total = number_format(array_sum($totalPrice),2);
+        $total = number_format(array_sum($totalPrice), 2);
+
         $places = $placesIdCount->keys();
+
         //вычесть квоту
         foreach ($placesIdCount as $key => $placeId) {
             $place = Place::query()->find($key);
@@ -39,6 +42,7 @@ class OrderService
             $place->quota = $placeQuota;
             $place->save();
         }
+
         //создать заказ
         $order = new Order();
         $order->total = $total;
@@ -66,6 +70,7 @@ class OrderService
         Order::query()->where('id', $order->id)->update(['status' => 'canceled']);
         $order = Order::query()->find($order->id);
         $order->tickets;
+
         return $order;
     }
 
@@ -77,8 +82,10 @@ class OrderService
     function get(
         Order $order
     ): Model|Collection|Builder|array|null {
+
         $order = Order::query()->find($order->id);
         $order->tickets;
+
         return $order;
     }
 
@@ -90,9 +97,11 @@ class OrderService
     function confirm(
         Order $order
     ): Builder|array|Collection|Model {
+
         Order::query()->where('id', $order->id)->update(['status' => 'confirmed']);
         $order = Order::query()->find($order->id);
         $order->tickets;
+
         return $order;
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateOrderRequest;
+use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use App\Service\OrderService;
 use Illuminate\Http\JsonResponse;
@@ -45,7 +46,7 @@ class OrderController extends Controller
     {
         $order = $this->orderService->get($order);
 
-        return new JsonResponse($order);
+        return new JsonResponse((new OrderResource($order)));
     }
 
     /**
@@ -55,9 +56,9 @@ class OrderController extends Controller
 
     public function create(CreateOrderRequest $request): JsonResponse
     {
-        $placesIds=collect($request->input('places'));
+        $placesIds = collect($request->input('places'));
         $createOrder = $this->orderService->create($placesIds);
 
-                 return new JsonResponse($createOrder);
+        return new JsonResponse($createOrder);
     }
 }
